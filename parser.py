@@ -77,6 +77,6 @@ class Parser():
             try:
                 submission = reddit.get_submission(row['url'])
             except:
-                logging.exception('Unable to request ' + row['url'])
+                logging.error('Unable to request ' + row['url'])
                 continue
             yield submission
