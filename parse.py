@@ -50,13 +50,13 @@ class Parser():
 
     def _row_to_dict(self, row):
         return {
-            'whisky' = row[1],
-            'user'   = row[2],
-            'url'    = row[3],
-            'score'  = row[4],
-            'region' = row[5],
-            'price'  = row[6],
-            'date'   = row[7]
+            'whisky': row[1],
+            'user'  : row[2],
+            'url'   : row[3],
+            'score' : row[4],
+            'region': row[5],
+            'price' : row[6],
+            'date'  : row[7]
         }
 
     def get_rows(self):
