@@ -71,7 +71,7 @@ class Parser():
         reddit = praw.Reddit(self.user_agent)
         counter = 0
         for row in self.get_rows():
-            while counter < skip:
+            if counter < skip:
                 counter += 1
                 continue
             try:
