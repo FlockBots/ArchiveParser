@@ -61,9 +61,11 @@ class Parser():
         }
 
     def get_rows(self):
-        reader = csv.reader(self.filename, delimiter=',')
-        for row in reader:
-            yield self._row_to_dict(row)
+        with open(self.filename, 'r') as archive:
+            reader = csv.reader(archive, delimiter=',')
+            headers = next(reader)
+            for row in reader:
+                yield self._row_to_dict(row)
 
     def get_submissions(self):
         reddit = praw.Reddit(self.user_agent)
