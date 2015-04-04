@@ -61,7 +61,7 @@ class Parser():
         }
 
     def get_rows(self):
-        with open(self.filename, 'r') as archive:
+        with open(self.filename, encoding='utf-8', mode='r') as archive:
             reader = csv.reader(archive, delimiter=',')
             headers = next(reader)
             for row in reader:
