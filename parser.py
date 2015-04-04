@@ -67,9 +67,13 @@ class Parser():
             for row in reader:
                 yield self._row_to_dict(row)
 
-    def get_submissions(self):
+    def get_submissions(self, skip=0):
         reddit = praw.Reddit(self.user_agent)
+        counter = 0
         for row in self.get_rows():
+            while counter < skip:
+                counter += 1
+                continue
             try:
                 submission = reddit.get_submission(row['url'])
             except:
