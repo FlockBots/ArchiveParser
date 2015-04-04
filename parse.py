@@ -25,7 +25,7 @@ class Parser():
         with open(self.filename, encoding='utf-8', mode='w') as f:
             f.write(data)
 
-    def _parse_date(self, date_string):
+    def parse_date(self, date_string):
         """Gets the year, month and day from a string in mm/dd/yy(yy) format
 
         Asserts the string is in mm/dd/yy or mm/dd/yyyy format
