@@ -5,6 +5,7 @@ from urllib.request import build_opener, HTTPCookieProcessor
 class Parser():
     def __init__(self, filename):
         self.filename = filename
+        self.user_agent = 'Whisky Archive Parser by /u/FlockOnFire'
         logging.basicConfig(
             filename='parser.log',
             level=logging.INFO,
@@ -60,7 +61,7 @@ class Parser():
         }
 
     def get_rows(self):
-        reader = csv.reader(self.filename, delimitor=',')
+        reader = csv.reader(self.filename, delimiter=',')
         for row in reader:
             yield self._row_to_dict(row)
 
