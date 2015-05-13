@@ -6,6 +6,7 @@ from collections import namedtuple
 class Parser():
     def __init__(self, filename):
         self.filename = filename
+        self.user_agent = 'Whisky Archive Parser by /u/FlockOnFire'
         logging.basicConfig(
             filename='parser.log',
             level=logging.INFO,
@@ -27,7 +28,7 @@ class Parser():
         with open(self.filename, encoding='utf-8', mode='w') as f:
             f.write(data)
 
-    def _parse_date(self, date_string):
+    def parse_date(self, date_string):
         """Gets the year, month and day from a string in mm/dd/yy(yy) format
 
         Asserts the string is in mm/dd/yy or mm/dd/yyyy format
@@ -55,27 +56,33 @@ class Parser():
 
     def _row_to_dict(self, row):
         return {
-            'whisky' = row[1],
-            'user'   = row[2],
-            'url'    = row[3],
-            'score'  = row[4],
-            'region' = row[5],
-            'price'  = row[6],
-            'date'   = row[7]
+            'whisky': row[1],
+            'user'  : row[2],
+            'url'   : row[3],
+            'score' : row[4],
+            'region': row[5],
+            'price' : row[6],
+            'date'  : row[7]
         }
 
     def get_rows(self):
-        reader = csv.reader(self.filename, delimitor=',')
-        for row in reader:
-            yield self._row_to_dict(row)
+        with open(self.filename, encoding='utf-8', mode='r') as archive:
+            reader = csv.reader(archive, delimiter=',')
+            headers = next(reader)
+            for row in reader:
+                yield self._row_to_dict(row)
 
-    def get_submissions(self):
+    def get_submissions(self, skip=0):
         reddit = praw.Reddit(self.user_agent)
         rows = self.get_rows();
-        for row in rows:
+        counter = 0
+        for row in self.get_rows():
+            if counter < skip:
+                counter += 1
+                continue
             try:
                 submission = reddit.get_submission(row['url'])
             except:
-                logging.exception('Unable to request ' + row['url'])
+                logging.error('Unable to request ' + row['url'])
                 continue
             yield submission
