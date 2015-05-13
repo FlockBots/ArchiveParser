@@ -71,7 +71,8 @@ class Parser():
 
     def get_submissions(self):
         reddit = praw.Reddit(self.user_agent)
-        for row in self.get_rows():
+        rows = self.get_rows();
+        for row in rows:
             try:
                 submission = reddit.get_submission(row['url'])
             except:
