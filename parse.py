@@ -1,6 +1,7 @@
 import csv, praw, requests, re, logging
 from http.cookiejar import CookieJar
 from urllib.request import build_opener, HTTPCookieProcessor
+from collections import namedtuple
 
 class Parser():
     def __init__(self, filename):
@@ -38,7 +39,7 @@ class Parser():
             date_string: (string) Date in mm/dd/yy or mm/dd/yyyy format
 
         Returns:
-            The (year, month, day) tuple.
+            A namedtuple with year, month and day attributes
         """
         match = self.date_pattern.search(date_string)
         if match:
@@ -47,7 +48,9 @@ class Parser():
                 month, day = day, month
             if year < 1000:
                 year += 2000
-            return (year, month, day)
+
+            date = namedtuple("Date", ["year", "month", "day"])
+            return date(year, month, day)
         return None
 
     def _row_to_dict(self, row):
