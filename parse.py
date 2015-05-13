@@ -12,6 +12,8 @@ class Parser():
             style='{'
         )
 
+        self.date_pattern = re.compile(r'\d{2}.\d{2}.\d{2,4}')
+
         # disable requests logging
         requests_logger = logging.getLogger('requests')
         requests_logger.propagate = False
