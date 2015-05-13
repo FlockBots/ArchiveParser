@@ -15,7 +15,7 @@ class Parser():
         )
 
         self.date_pattern = re.compile(r'\d{2}.\d{2}.\d{2,4}')
-
+        self.date_tuple = namedtuple("Date", ["year", "month", "day"])
         # disable requests logging
         requests_logger = logging.getLogger('requests')
         requests_logger.propagate = False
@@ -50,8 +50,7 @@ class Parser():
             if year < 1000:
                 year += 2000
 
-            date = namedtuple("Date", ["year", "month", "day"])
-            return date(year, month, day)
+            return self.date_tuple(year, month, day)
         return None
 
     def _row_to_dict(self, row):
