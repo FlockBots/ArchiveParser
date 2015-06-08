@@ -1,1 +1,1 @@
-from ArchiveParser.parser import Parser
+from archive_parser.parser import Parser
