@@ -7,18 +7,11 @@ class Parser():
     def __init__(self, filename):
         self.filename = filename
         self.user_agent = 'Whisky Archive Parser by /u/FlockOnFire'
-        logging.basicConfig(
-            filename='parser.log',
-            level=logging.INFO,
-            format='{asctime} | {levelname:^8} | {message}',
-            style='{'
-        )
+
+        self.logger = logging.getLogger(__name__)
 
         self.date_pattern = re.compile(r'\d{2}.\d{2}.\d{2,4}')
         self.date_tuple = namedtuple("Date", ["year", "month", "day"])
-        # disable requests logging
-        requests_logger = logging.getLogger('requests')
-        requests_logger.propagate = False
 
     def download(self, key):
         logging.info('Downloading Archive')
@@ -61,7 +54,7 @@ class Parser():
             'score' : row[4],
             'region': row[5],
             'price' : row[6],
-            'date'  : row[7]
+            'date'  : parse_date(row[7])
         }
 
     def get_rows(self):
@@ -72,6 +65,7 @@ class Parser():
                 yield self._row_to_dict(row)
 
     def get_submissions(self, skip=0):
+        """ Returns the submission from row['url'] along with the row itself. """
         reddit = praw.Reddit(self.user_agent)
         rows = self.get_rows();
         counter = 0
@@ -82,6 +76,6 @@ class Parser():
             try:
                 submission = reddit.get_submission(row['url'])
             except:
-                logging.error('Unable to request ' + row['url'])
+                self.logger.error('Unable to request ' + row['url'])
                 continue
-            yield submission
+            yield (row, submission)
