@@ -10,7 +10,7 @@ class Parser():
 
         self.logger = logging.getLogger(__name__)
 
-        self.date_pattern = re.compile(r'\d{2}.\d{2}.\d{2,4}')
+        self.date_pattern = re.compile(r'(\d{2}).(\d{2}).(\d{2,4})')
         self.date_tuple = namedtuple("Date", ["year", "month", "day"])
 
     def download(self, key):
@@ -35,7 +35,7 @@ class Parser():
         Returns:
             A namedtuple with year, month and day attributes
         """
-        match = self.date_pattern.search(date_string)
+        match = self.date_pattern.match(date_string)
         if match:
             month, day, year = map(int, match.groups())
             if month > 12:
@@ -54,7 +54,7 @@ class Parser():
             'score' : row[4],
             'region': row[5],
             'price' : row[6],
-            'date'  : parse_date(row[7])
+            'date'  : self.parse_date(row[7])
         }
 
     def get_rows(self):
@@ -64,7 +64,7 @@ class Parser():
             for row in reader:
                 yield self._row_to_dict(row)
 
-    def get_submissions(self, skip=0):
+    def get_submissions(self, skip=1):
         """ Returns the submission from row['url'] along with the row itself. """
         reddit = praw.Reddit(self.user_agent)
         rows = self.get_rows();
