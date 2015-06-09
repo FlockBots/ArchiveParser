@@ -80,7 +80,7 @@ class Parser():
     def get_submissions(self, skip=0):
         """ Returns the submission from row['url'] along with the row itself. """
         reddit = praw.Reddit(self.user_agent)
-        rows = self.get_rows();
+        rows = self.get_rows()
         counter = 0
         for row in self.get_rows():
             if counter < skip:
