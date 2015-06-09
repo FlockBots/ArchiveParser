@@ -1,17 +1,17 @@
 import csv, praw, requests, re, logging
 from http.cookiejar import CookieJar
 from urllib.request import build_opener, HTTPCookieProcessor
-from collections import namedtuple
+from datetime import date
+from pprint import pprint
 
 class Parser():
     def __init__(self, filename):
         self.filename = filename
         self.user_agent = 'Whisky Archive Parser by /u/FlockOnFire'
-
         self.logger = logging.getLogger(__name__)
-
         self.date_pattern = re.compile(r'(\d{2}).(\d{2}).(\d{2,4})')
-        self.date_tuple = namedtuple("Date", ["year", "month", "day"])
+        self.url_pattern = re.compile(r'^https?://www\.')
+        self.i18n_pattern = re.compile(r'(https?://www\.)[a-z]{2}\.(reddit.*)')
 
     def download(self, key):
         logging.info('Downloading Archive')
@@ -20,6 +20,19 @@ class Parser():
         data = response.read().decode('utf-8')
         with open(self.filename, encoding='utf-8', mode='w') as f:
             f.write(data)
+
+    def fix_url(self, url):
+        """ Appends `https://wwww.` and removes any internationalisation
+        from the domain (e.g. pt.reddit.com). """
+        if not self.url_pattern.match(url):
+            if url.startswith('http'):
+                url = 'https://www.' + url[7:]
+            elif url.startswith('www.'):
+                url = 'https://' + url
+            else:
+                url = 'https://www.' + url
+        url = self.i18n_pattern.sub(r'\1\2', url)
+        return url
 
     def parse_date(self, date_string):
         """Gets the year, month and day from a string in mm/dd/yy(yy) format
@@ -50,7 +63,7 @@ class Parser():
         return {
             'whisky': row[1],
             'user'  : row[2],
-            'url'   : row[3],
+            'url'   : self.fix_url(row[3]),
             'score' : row[4],
             'region': row[5],
             'price' : row[6],
