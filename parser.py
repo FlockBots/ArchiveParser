@@ -88,10 +88,11 @@ class Parser():
                 continue
             try:
                 submission = reddit.get_submission(row['url'])
-            except:
+            except requests.exceptions.RequestException:
                 self.logger.error('Unable to request ' + row['url'])
                 continue
-            yield (row, submission)
+            except ValueError:
+                self.logger.error('Invalid url ({})'.format(row['url']))
             else:
                 if not row['date']:
                     row['date'] = date.fromtimestamp(submission.created_utc)
