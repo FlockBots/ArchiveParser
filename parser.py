@@ -46,7 +46,7 @@ class Parser():
             date_string: (string) Date in mm/dd/yy or mm/dd/yyyy format
 
         Returns:
-            A namedtuple with year, month and day attributes
+            datetime.date object
         """
         match = self.date_pattern.match(date_string)
         if match:
@@ -56,7 +56,7 @@ class Parser():
             if year < 1000:
                 year += 2000
 
-            return self.date_tuple(year, month, day)
+            return date(year, month, day)
         return None
 
     def _row_to_dict(self, row):
@@ -92,3 +92,7 @@ class Parser():
                 self.logger.error('Unable to request ' + row['url'])
                 continue
             yield (row, submission)
+            else:
+                if not row['date']:
+                    row['date'] = date.fromtimestamp(submission.created_utc)
+                yield (row, submission)
