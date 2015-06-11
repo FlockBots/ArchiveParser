@@ -2,14 +2,13 @@ import csv, praw, requests, re, logging
 from http.cookiejar import CookieJar
 from urllib.request import build_opener, HTTPCookieProcessor
 from datetime import date
-from pprint import pprint
 
 class Parser():
     def __init__(self, filename):
         self.filename = filename
         self.user_agent = 'Whisky Archive Parser by /u/FlockOnFire'
         self.logger = logging.getLogger(__name__)
-        self.date_pattern = re.compile(r'(\d{2}).(\d{2}).(\d{2,4})')
+        self.date_pattern = re.compile(r'(\d{1,2}).(\d{1,2}).(\d{2,4})')
         self.url_pattern = re.compile(r'^https?://www\.')
         self.i18n_pattern = re.compile(r'(https?://www\.)[a-z]{2}\.(reddit.*)')
 
@@ -61,6 +60,7 @@ class Parser():
 
     def _row_to_dict(self, row):
         return {
+            'archived': self.parse_date(row[0]),
             'whisky': row[1],
             'user'  : row[2],
             'url'   : self.fix_url(row[3]),
@@ -77,18 +77,30 @@ class Parser():
             for row in reader:
                 yield self._row_to_dict(row)
 
-    def get_submissions(self, skip=0):
-        """ Returns the submission from row['url'] along with the row itself. """
+    def get_submissions(self, skip=0, row_filter=None):
+        """ Returns the submission from row['url'] along with the row itself. 
+
+            Args:
+                skip: (int) Skip the first number of rows.
+                filter: Function that takes on argument (the row).
+                        Skips if it returns True, yields otherwise.
+            Returns:
+                Generator of the row and respective submission as a tuple.
+        """
+        if not row_filter:
+            row_filter = lambda rev: False
         reddit = praw.Reddit(self.user_agent)
         rows = self.get_rows()
-        counter = 0
-        for row in self.get_rows():
+        for counter, row in enumerate(self.get_rows()):
+            if counter % 500 == 0:
+                self.logger.info('Parsed {} reviews (incl. skips)'.format(counter))
             if counter < skip:
-                counter += 1
+                continue
+            if row_filter(row):
                 continue
             try:
                 submission = reddit.get_submission(row['url'])
-            except requests.exceptions.RequestException:
+            except (requests.exceptions.RequestException, praw.errors.RedirectException):
                 self.logger.error('Unable to request ' + row['url'])
                 continue
             except ValueError:
