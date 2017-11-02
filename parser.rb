@@ -79,7 +79,7 @@ class Parser
   end
 
   def parse_rating(rating)
-    rating.gsub(/[^\d]/, '')
+    rating.gsub(/[^\d\.\,]/, '')
           .to_i
   end
 
