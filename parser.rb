@@ -30,7 +30,7 @@ class Parser
   end
 
   def create_records
-    rows = CSV.read @source
+    rows = CSV.read @source, encoding: "UTF-8"
     rows.shift if @has_header
 
     Enumerator.new do |enum|
