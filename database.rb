@@ -16,7 +16,7 @@ module Database
 
   def self.setup(path)
     path = File.expand_path(path)
-    DataMapper.setup(:default, "sqlite://./#{path}")
+    DataMapper.setup(:default, "sqlite://#{path}")
     DataMapper.auto_upgrade!
   end
 end

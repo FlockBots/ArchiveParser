@@ -25,18 +25,12 @@ class Parser
     @records || (@records = create_records)
   end
 
-  def record_number
-    @record_number || 0
-  end
-
   def create_records
     rows = CSV.read @source, encoding: "UTF-8"
     rows.shift if @has_header
 
     Enumerator.new do |enum|
-      i = 0
       rows.each do |row|
-        @record_number = i += 1
         enum.yield Review.new(
           parse_redditor(row[FIELDS[:redditor]]),
           parse_whisky(row[FIELDS[:whisky]]),
@@ -52,15 +46,17 @@ class Parser
 
   def parse_date(date)
     return nil if date.nil?
-    string = date.gsub(/\s+/, '')
-    m,d,y = string.split(/[^\d]/).reject(&:empty?)
+
+    string = date.strip
+    m, d, y = string.split(/[^\d]/).reject(&:empty?)
+
     m, d = d, m if m.to_i > 12
     y = 2000 + y.to_i if y.to_i < 2000
-    date_string = [m,d,y].join('/')
+
     begin
-      Date.strptime(date_string, '%m/%d/%Y')
+      Date.new(y.to_i, m.to_i, d.to_i)
     rescue ArgumentError
-      @logger.error "Invalid date '#{string} -> #{date_string}'"
+      @logger.error "Invalid date '#{date}' (#{y}/#{m}/#{d})"
       nil
     end
   end
@@ -79,7 +75,7 @@ class Parser
   end
 
   def parse_rating(rating)
-    rating.gsub(/[^\d\.\,]/, '')
+    rating.gsub(/[^\d\.,]/, '')
           .to_i
   end
 
