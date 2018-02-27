@@ -6,9 +6,9 @@ describe Review do
   end
 
   describe '#uri' do
-    it "prefixes with 'http://' when no scheme is specified" do
+    it "prefixes with 'https://' when no scheme is specified" do
       subject.url = 'reddit.com'
-      expect(subject.uri.to_s).to eq 'http://reddit.com'
+      expect(subject.uri.to_s).to eq 'https://reddit.com'
     end
 
     it "removes any unicode characters for parsing" do
