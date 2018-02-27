@@ -16,7 +16,7 @@ class Review <
   def uri
     return @uri unless @uri.nil?
     new_uri = url.gsub(/\P{ASCII}/, '')
-    new_uri = 'http://' + new_uri if (new_uri =~ /^https?:\/\//).nil?
+    new_uri = 'https://' + new_uri if (new_uri =~ /^https?:\/\//).nil?
     @uri = URI.parse new_uri
   end
 
@@ -29,9 +29,10 @@ class Review <
   end
 
   def subreddit
+    return @subreddit unless @subreddit.nil?
     return nil if !on_reddit?
     parts = uri.path.split('/')
     return nil if parts.count < 3 || parts[1] != 'r'
-    return parts[2].downcase
+    @subreddit = parts[2].downcase
   end
 end
