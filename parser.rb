@@ -31,15 +31,19 @@ class Parser
 
     Enumerator.new do |enum|
       rows.each do |row|
-        enum.yield Review.new(
-          parse_redditor(row[FIELDS[:redditor]]),
-          parse_whisky(row[FIELDS[:whisky]]),
-          parse_date(row[FIELDS[:date]]),
-          parse_url(row[FIELDS[:url]]),
-          parse_rating(row[FIELDS[:rating]]),
-          parse_region(row[FIELDS[:region]]),
-          parse_date(row[FIELDS[:timestamp]]) || Date.today
-        )
+        begin
+          enum.yield Review.new(
+            parse_redditor(row[FIELDS[:redditor]]),
+            parse_whisky(row[FIELDS[:whisky]]),
+            parse_date(row[FIELDS[:date]]),
+            parse_url(row[FIELDS[:url]]),
+            parse_rating(row[FIELDS[:rating]]),
+            parse_region(row[FIELDS[:region]]),
+            parse_date(row[FIELDS[:timestamp]]) || Date.today
+          )
+        rescue => e
+          @logger.error e.backtrace.inspect
+        end
       end
     end
   end
@@ -75,6 +79,7 @@ class Parser
   end
 
   def parse_rating(rating)
+    return nil if rating.nil?
     rating.gsub(/[^\d\.,]/, '')
           .to_i
   end
