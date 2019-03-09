@@ -18,7 +18,8 @@ class Parser
   def initialize(source, has_header=true)
     @source = source
     @has_header = has_header
-    @logger = Logger.new('parser.log')
+    logfile = File.join(__dir__, 'parser.log')
+    @logger = Logger.new(logfile)
   end
 
   def records

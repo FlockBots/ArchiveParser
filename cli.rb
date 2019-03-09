@@ -40,7 +40,9 @@ min_age = args[:date]
 
 parser = Parser.new(source)
 database = Database::setup(target)
-logger = Logger.new('cli.log')
+
+logfile = File.join(__dir__, 'cli.log')
+logger = Logger.new(logfile)
 
 parser.records.each do |record|
   if record.archived_at < min_age
